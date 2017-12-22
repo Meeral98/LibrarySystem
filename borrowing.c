@@ -39,11 +39,9 @@ int borrow(char*ispn,int ID,date Borrowed, date Due)
                     u[i].borrows++;
                     Library[k].borrowed++;
                     Library[k].Copies_left--;
-                    b[bSize].ID=ID;
-                    strcpy(b[bSize].ispn,ispn);
-                    b[bSize].returned=0;
                     b[bSize]=constructBorrowing(ispn,ID,Borrowed,Due);
                     bSize++;
+                    printf("%d",bSize);
                     return 1;
                 }
             }
@@ -114,6 +112,7 @@ borrowing constructBorrowing(char*ispn,int ID,date b,date d)
     Borrowing.Borrowed=b;
     Borrowing.Due=d;
     Borrowing.Returned=constructDate(0,0,0);
+    Borrowing.returned=0;
     return Borrowing;
 }
 void saveBorrow(char*fileName)
@@ -134,5 +133,6 @@ void readBorrow(char*fileName)
 {
     FILE*f=fopen(fileName,"r");
     int i;
+
 
 }
