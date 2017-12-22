@@ -1,6 +1,7 @@
 #include "borrowing.h"
 #include "user.h"
 #include "book.h"
+#include "time.h"
 
 extern user u[100];
 extern Book Library[100];
@@ -127,7 +128,7 @@ void printBorrow()
 {
     int i;
     for(i=0;i<bSize;i++)
-        printf("%s, %d, %d/%d/%d, %d/%d/%d, %d/%d/%d\n",b[i].ispn,b[i].ID,b[i].Borrowed.day,b[i].Borrowed.month,b[i].Borrowed.year,b[i].Due.day,b[i].Due.month,b[i].Due.year,b[i].Returned.day,b[i].Returned.month,b[i].Returned.year);
+        printB(i);
 }
 void readBorrow(char*fileName)
 {
@@ -135,4 +136,40 @@ void readBorrow(char*fileName)
     int i;
 
 
+}
+int inTime(date d1,date d2)
+{
+    if(d2.year==d1.year)
+    {
+        if(d2.month==d1.month)
+        {
+            if(d2.day<=d1.day)
+                return 1;
+            return 0;
+        }
+        if(d2.month<d1.month)
+            return 1;
+        return 0;
+    }
+    if(d2.year<d1.year)
+        return 1;
+    return 0;
+}
+void printOverDue()
+{
+    int counter=0;
+    int i;
+    time_t t=time(NULL);
+    struct tm tm=*localtime(&t);
+    date currentDate=constructDate(tm.tm_mday,tm.tm_mon+1,tm.tm_year+1900);
+    for(i=0;i<bSize;i++)
+    {
+        if((inTime(b[i].Due,currentDate))||(b[i].Returned.day!=0))
+            continue;
+        printB(i);
+    }
+}
+void printB(int i)
+{
+    printf("%s, %d, %d/%d/%d, %d/%d/%d, %d/%d/%d\n",b[i].ispn,b[i].ID,b[i].Borrowed.day,b[i].Borrowed.month,b[i].Borrowed.year,b[i].Due.day,b[i].Due.month,b[i].Due.year,b[i].Returned.day,b[i].Returned.month,b[i].Returned.year);
 }

@@ -149,7 +149,6 @@ void borrowManagement()
         printf("Enter Due Date: ");
         Due=scanDate();
         getchar();
-        char buffer[26];
         time_t t=time(NULL);
         struct tm tm=*localtime(&t);
         Borrowed=constructDate(tm.tm_mday,tm.tm_mon+1,tm.tm_year+1900);
@@ -196,6 +195,8 @@ void administrativeActions()
         case'2':printBooks();
                 break;
         case'3':printBorrow();
+                break;
+        case'4':printOverDue();
                 break;
         case'5':printBook(mostPopular());
                 break;

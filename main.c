@@ -20,6 +20,7 @@ int main()
 {
     read_books();
     fgetUsers(usersFile);
+    readBorrow(borrowFile);
     mainMenu();
     return 0;
 }

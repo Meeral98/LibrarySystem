@@ -27,4 +27,7 @@ int returnBorrow(char*ispn,int ID,date Returned);
 void saveBorrow(char*);
 void printBorrow();
 void readBorrow(char*);
+int inTime(date d1,date d2); //returns true if date 2 is before/equal date 1
+void printOverDue();
+void printB(int i);
 #endif // BORROWING_H_INCLUDED
