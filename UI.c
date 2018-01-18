@@ -2,127 +2,181 @@
 #include "UI.h"
 #include "book.h"
 #include <time.h>
-extern Book Library[100];
-extern n;
-extern usersFile[];
-extern borrowFile[];
+#include <stdio.h>
+
+void saveAll(){
+    writeUsers(usersFile);
+    writeBooks(libraryFile);
+    writeBorrowings(borrowingsFile);
+    return;
+}
 void mainMenu()
 {
     printf("Please choose one of the Following:\n");
     printf("Book Management:(1)\nMemember Management:(2)\nBorrow Management:(3)\nAdministrative Actions:(4)\nSave Changes:(5)\nExit:(6)\n");
-    char input;
-    scanf("%c",&input);
-    getchar();
-    switch(input)
+    char input[2];
+    fgets(input,2,stdin);
+    fflush(stdin);
+    switch(atoi(input))
     {
-        case'1':system("cls");
+        case 1: system("cls");
+                printf("Book Management:\n");
                 bookManagement();
                 break;
-        case'2':system("cls");
+        case 2: system("cls");
+                printf("User Management:\n");
                 userManagement();
                 break;
-        case'3':system("cls");
+        case 3: system("cls");
+                printf("Borrow Management:\n");
                 borrowManagement();
                 break;
-        case'4':system("cls");
+        case 4: system("cls");
+                printf("Administrative Actions:\n");
                 administrativeActions();
                 break;
-        case'5':saveUsers(usersFile);
-                write_books();
-                saveBorrow(borrowFile);
+        case 5: saveAll();
                 printf("Successfully Saved!\n");
                 break;
-        case'6':printf("Do you want to save changes before exit? Enter Y or N ");
-                scanf("%c",&input);
-                if(input=='Y'||input=='y')
+        case 6: printf("Do you want to save changes before exit? Enter Y or N ");
+                char answer[2];
+                fgets(answer,2,stdin);
+                fflush(stdin);
+                if(answer[0]=='Y'||answer[0]=='y')
                 {
-                    saveUsers("D:/Codes/Uni/books.cont/abc.txt");
-                    write_books();
-                    saveBorrow(borrowFile);
+                    saveAll();
                     printf("Successfully Saved!\n");
                 }
                 exit(0);
-        default:printf("Please enter a valid entry\n");
+        default:printf("Please enter a valid entry!\n");
     }
     mainMenu();
 }
 void userManagement()
 {
-    printf("User Management:\n");
     printf("Add new user:(1)\nDelete user:(2)\nBack:(3)\n");
-    char input;
-    scanf("%c",&input);
-    getchar();
-    if(input=='1')
-        if(n==100)
+    char input[2];
+    fgets(input,2,stdin);
+    fflush(stdin);
+    if(atoi(input)==1)
+    {
+        if(USERS_SIZE==MAX_USERS_SIZE)
             printf("USER LIMIT REACHED!\n");
         else
             addUser();
-    else if(input=='2')
+    }
+    else if(atoi(input)==2)
     {
-        int id;
+        char id[11];
         printf("Enter user ID:");
-        scanf("%d",&id);
-        getchar();
-        int k=deleteUser(id);
-        if(k==-1)
-            printf("User not found\n");
+        fgets(id,sizeof(id),stdin);
+        fflush(stdin);
+        int ret=deleteUser(atoi(id));
+        if(ret==-1)
+            printf("User not found!\n");
+        else if(ret==0)
+            printf("User still has unreturned books. Please return borrowed books then try again!\n");
         else
             printf("Successfully Deleted!\n");
     }
-    else if(input=='3')
+    else if(atoi(input)==3)
     {
         system("cls");
         mainMenu();
     }
     else
-        printf("Please enter a valid entry\n");
+        printf("Please enter a valid entry!\n");
     userManagement();
 }
 void bookManagement()
 {
-    printf("Book Management:\n");
     printf("Insert New Book:(1)\nSearch for a book:(2)\nAdd New Copies:(3)\nDelete:(4)\nEdit:(5)\nBack:(6)\n");
-    char input,ispn[30];
-    int x;
-    scanf("%c",&input);
-    getchar();
-    switch(input)
+    char ispn[100];
+    char input[2];
+    fgets(input,2,stdin);
+    fflush(stdin);
+    int bookIndex;
+    switch(atoi(input))
     {
-        case'1':readBook();
+        case 1: addBook();
                 break;
-        case'2':printf("Enter Book ISPN: ");
-                scanf("%s",ispn);
-                getchar();
-                x=search(ispn);
-                if(x==-1)
-                    printf("Book not found!\n");
-                else
-                    printBook(x);
+        case 2: system("cls");
+                printf("Search by Title:(1)\nSearch by Author:(2)\nSearch by ISBN:(3)\nSearch by Category:(4)\nBack:(5)\n");
+                char entry[2];
+                char key[100];
+                fgets(entry,2,stdin);
+                fflush(stdin);
+                if(atoi(entry)==5)
+                    bookManagement();
+                printf("Enter Search Data: ");
+                fgets(key,sizeof(key),stdin);
+                key[strlen(key)-1]=0;
+                fflush(stdin);
+                if((atoi(entry)<1)||(atoi(entry)>4))
+                {
+                    printf("Invalid Input!\n");
+                    bookManagement();
+                }
+                searchBook(key,atoi(entry));
                 break;
-        case'3':printf("Enter Book ISPN: ");
-                scanf("%s",ispn);
-                getchar();
-                x=search(ispn);
-                if(x==-1)
+        case 3: printf("Enter Book ISBN: ");
+                fgets(ispn,sizeof(ispn),stdin);
+                ispn[strlen(ispn)-1]=0;
+                fflush(stdin);
+                bookIndex=findBook(ispn);
+                if(bookIndex==-1)
                     printf("Book not found!\n");
                 else
                 {
                     printf("Enter number of new copies: ");
-                    int c;
-                    scanf("%d",&c);
-                    getchar();
-                    Library[x].Copies+=c;
-                    Library[x].Copies_left+=c;
+                    char newCopies[10];
+                    fgets(newCopies,sizeof(newCopies),stdin);
+                    fflush(stdin);
+                    if(atoi(newCopies)<0)
+                    {
+                        printf("Invalid number of copies!\n");
+                        break;
+                    }
+                    Library[bookIndex].Copies+=atoi(newCopies);
+                    Library[bookIndex].Copies_left+=atoi(newCopies);
                 }
                 break;
-        case'4':printf("Enter Book ISPN: ");
-                scanf("%s",ispn);
-                getchar();
-                delete(ispn);
+        case 4: printf("Enter Book ISBN: ");
+                fgets(ispn,sizeof(ispn),stdin);
+                ispn[strlen(ispn)-1]=0;
+                fflush(stdin);
+                if(deleteBook(ispn))
+                    printf("Successfully Deleted!\n");
+                else
+                    printf("Book not found!\n");
                 break;
-        case'5':
-        case'6':system("cls");
+        case 5: printf("Enter Book ISBN: ");
+                fgets(ispn,sizeof(ispn),stdin);
+                ispn[strlen(ispn)-1]=0;
+                fflush(stdin);
+                int index=findBook(ispn);
+                if(index==-1)
+                    printf("Book not found!\n");
+                else
+                {
+                    system("cls");
+                    printBook(index);
+                    printf("Edit Title:(1)\nEdit Author:(2)\nEdit ISBN:(3)\nEdit Publisher:(4)\nEdit Category:(5)\nBack:(6)\n");
+                    char n[2];
+                    fgets(n,2,stdin);
+                    fflush(stdin);
+                    if(atoi(n)==6)
+                        bookManagement();
+                    printf("Enter new data: ");
+                    char data[100];
+                    fgets(data,sizeof(data),stdin);
+                    if(editBooks(index,atoi(n),data)==1)
+                        printf("Successfully Edited!\n");
+                    else
+                        printf("Invalid entry!");
+                }
+                break;
+        case 6: system("cls");
                 mainMenu();
                 break;
         default:printf("Please enter a valid entry\n");
@@ -131,48 +185,52 @@ void bookManagement()
 }
 void borrowManagement()
 {
-    printf("Borrow Management:\n");
     printf("Borrow:(1)\nReturn:(2)\nBack:(3)\n");
-    char input;
-    int ID;
-    char ispn[30];
+    char ID[10], input[2];
+    char ispn[100];
     date Borrowed,Due,Returned;
-    scanf("%c",&input);
-    getchar();
-    if(input=='1')
+    fgets(input,2,stdin);
+    fflush(stdin);
+    if(atoi(input)==1)
     {
         printf("Enter User ID: ");
-        scanf("%d",&ID);
-        printf("Enter Book ISPN: ");
-        scanf("%s",ispn);
-        getchar();
+        fgets(ID,sizeof(ID),stdin);
+        ID[strlen(ID)-1]=0;
+        fflush(stdin);
+        printf("Enter Book ISBN: ");
+        fgets(ispn,sizeof(ispn),stdin);
+        ispn[strlen(ispn)-1]=0;
+        fflush(stdin);
         printf("Enter Due Date: ");
         Due=scanDate();
-        getchar();
+        fflush(stdin);
         time_t t=time(NULL);
         struct tm tm=*localtime(&t);
-        Borrowed=constructDate(tm.tm_mday,tm.tm_mon+1,tm.tm_year+1900);
-        if(borrow(ispn,ID,Borrowed,Due)==1)
+        Borrowed=constructDate(tm.tm_mday, tm.tm_mon+1, tm.tm_year+1900);
+        if(borrow(ispn,atoi(ID),Borrowed,Due)==1)
             printf("Successfully Borrowed!\n");
         else
-            printf("Borrow Unsuccessful!\n");
+            printf("Borrowing Unsuccessful!\n");
     }
-    else if(input=='2')
+    else if(atoi(input)==2)
     {
         printf("Enter User ID: ");
-        scanf("%d",&ID);
-        printf("Enter Book ISPN: ");
-        scanf("%s",ispn);
-        getchar();
+        fgets(ID,sizeof(ID),stdin);
+        ID[strlen(ID)-1]=0;
+        fflush(stdin);
+        printf("Enter Book ISBN: ");
+        fgets(ispn,sizeof(ispn),stdin);
+        ispn[strlen(ispn)-1]=0;
+        fflush(stdin);
         printf("Enter date of return: ");
         Returned=scanDate();
-        getchar();
-        if(returnBorrow(ispn,ID,Returned)==1)
+        fflush(stdin);
+        if(returnBorrowing(ispn,atoi(ID),Returned))
             printf("Successfully Returned!\n");
         else
             printf("Return Unsuccessful!\n");
     }
-    else if(input=='3')
+    else if(atoi(input)==3)
     {
         system("cls");
         mainMenu();
@@ -183,24 +241,23 @@ void borrowManagement()
 }
 void administrativeActions()
 {
-    printf("Administrative Actions:\n");
     printf("Print User Data:(1)\nPrint Book Data:(2)\nPrint Borrow Data:(3)\nPrint Overdue Books:(4)\nPrint Most Popular Books:(5)\nBack:(6)\n");
-    char input;
-    scanf("%c",&input);
-    getchar();
-    switch(input)
+    char input[2];
+    fgets(input,2,stdin);
+    fflush(stdin);
+    switch(atoi(input))
     {
-        case'1':printUser();
+        case 1: printUsers();
                 break;
-        case'2':printBooks();
+        case 2: printLibrary();
                 break;
-        case'3':printBorrow();
+        case 3: printAllBorrowings();
                 break;
-        case'4':printOverDue();
+        case 4: printOverDue();
                 break;
-        case'5':printBook(mostPopular());
+        case 5: printMostPopular();
                 break;
-        case'6':system("cls");
+        case 6: system("cls");
                 mainMenu();
                 break;
         default:printf("Please enter a valid entry\n");

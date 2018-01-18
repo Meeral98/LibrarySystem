@@ -1,9 +1,9 @@
 #include "user.h"
 #include <string.h>
+#include <stdio.h>
+user Users[MAX_USERS_SIZE];
+int USERS_SIZE=0;
 
-extern usersFile[];
-extern user u[100];
-extern int n;
 address constructAddress(int building,char*street,char*city)
 {
     address a;
@@ -29,50 +29,62 @@ user constructUser(char*firstN,char*lastN,int ID,address a,long phone,int age,ch
 
 address getAddress()
 {
-    int building;
-    char street[1024];
-    char city[1024];
-    char dummy;
-    printf("Enter Address:Building No:");
-    scanf("%d",&building);
-    scanf("%c",&dummy);
-    printf("Street Name:");
-    gets(street);
-    printf("City:");
-    gets(city);
-    return constructAddress(building,street,city);
+    char building[10];
+    char street[100];
+    char city[100];
+    printf("Enter Address:\nBuilding No: ");
+    fgets(building,sizeof(building),stdin);
+    printf("Street Name: ");
+    fgets(street,sizeof(street),stdin);
+    street[strlen(street)-1]=0;
+    printf("City: ");
+    fgets(city,sizeof(city),stdin);
+    city[strlen(city)-1]=0;
+    return constructAddress(atoi(building),street,city);
 }
 
 void addUser()
 {
-    char firstN[1024], lastN[1024], email[1024],dummy;
-    int ID,age;
-    long phoneN;
-    printf("Enter your ID:");
-    scanf("%d",&ID);
-    if(findUser(ID)!=-1)
+    char firstN[100], lastN[100], email[100];
+    char ID[11],age[11];
+    char phoneN[13];
+    printf("Enter your ID: ");
+    fgets(ID,sizeof(ID),stdin);
+    ID[strlen(ID)-1]=0;
+    fflush(stdin);
+    if(findUser(atoi(ID))!=-1)
     {
         do
         {
             printf("ID already exists, please enter another ID ");
-            scanf("%d",&ID);
-        }while(findUser(ID)!=-1);
+            fgets(ID,sizeof(ID),stdin);
+            ID[strlen(ID)-1]=0;
+            fflush(stdin);
+        }while(findUser(atoi(ID))!=-1);
     }
-    scanf("%c",&dummy);
-    printf("Enter your name (FirstName LastName)");
-    scanf("%s %s",firstN,lastN);
-    scanf("%c",&dummy);
-    printf("Enter your email address:");
-    scanf("%s",email);
-    strcat(email,"\n");
-    printf("Enter your age:");
-    scanf("%d",&age);
-    printf("Enter your phoneNumber:");
-    scanf("%ld",&phoneN);
-    u[n]=constructUser(firstN,lastN,ID,getAddress(),phoneN,age,email);
-    n++;
+    printf("Enter your first name: ");
+    fgets(firstN,sizeof(firstN),stdin);
+    firstN[strlen(firstN)-1]=0;
+    fflush(stdin);
+    printf("Enter your last name: ");
+    fgets(lastN,sizeof(lastN),stdin);
+    lastN[strlen(lastN)-1]=0;
+    fflush(stdin);
+    printf("Enter your email address: ");
+    fgets(email,sizeof(email),stdin);
+    fflush(stdin);
+    printf("Enter your age: ");
+    fgets(age,sizeof(age),stdin);
+    age[strlen(age)-1]=0;
+    fflush(stdin);
+    printf("Enter your phoneNumber: ");
+    fgets(phoneN,sizeof(phoneN),stdin);
+    phoneN[strlen(phoneN)-1]=0;
+    fflush(stdin);
+    Users[USERS_SIZE]=constructUser(firstN,lastN,atoi(ID),getAddress(),atoi(phoneN),atoi(age),email);
+    USERS_SIZE++;
 }
-void fgetUsers(char fileName[])
+void readUsers(char fileName[])
 {
     FILE*f=fopen(fileName,"r");
     char b1[256];
@@ -80,6 +92,7 @@ void fgetUsers(char fileName[])
     int counter=0;
     while(fgets(b1,256,f))
     {
+        //break down line into data
         int i=0,prev=0,data=0;
         char fn[256],ln[256],st[256],c[256],m[256];
         int id,b,pn,age;
@@ -105,60 +118,54 @@ void fgetUsers(char fileName[])
             i++;
         }
         strcpy(m,b1+prev);
+        //construct address and user
         address a=constructAddress(b,st,c);
-        u[counter]=constructUser(fn,ln,id,a,pn,age,m);
+        Users[counter]=constructUser(fn,ln,id,a,pn,age,m);
         counter++;
     }
     fclose(f);
-    n=counter;
+    USERS_SIZE=counter;
 }
-void printUser()
+void printUser(int i)
+{
+    printf("%s, %s, %d, %d, %s, %s, %ld, %d, %s",Users[i].last_name,Users[i].first_name,Users[i].ID,Users[i].a.building,Users[i].a.street,Users[i].a.city,Users[i].phone_number,Users[i].age,Users[i].email);
+}
+void printUsers()
 {
     int i;
-    for(i=0;i<n;i++)
-        printf("%s, %s, %d, %d, %s, %s, %ld, %d, %s",u[i].last_name,u[i].first_name,u[i].ID,u[i].a.building,u[i].a.street,u[i].a.city,u[i].phone_number,u[i].age,u[i].email);
+    for(i=0;i<USERS_SIZE;i++)
+        printUser(i);
 }
-
-void fprintUser(FILE*d)
-{
-    int i;
-    for(i=0;i<n;i++)
-        fprintf(d,"%s, %s, %d, %d, %s, %s, %ld, %d, %s",u[i].last_name,u[i].first_name,u[i].ID,u[i].a.building,u[i].a.street,u[i].a.city,u[i].phone_number,u[i].age,u[i].email);
-}
-
-void saveUsers(char fileName[])
+void writeUsers(char fileName[])
 {
     FILE*f=fopen(fileName,"w");
-    fprintUser(f);
+     int i;
+    for(i=0;i<USERS_SIZE;i++)
+        fprintf(f,"%s, %s, %d, %d, %s, %s, %ld, %d, %s",Users[i].last_name,Users[i].first_name,Users[i].ID,Users[i].a.building,Users[i].a.street,Users[i].a.city,Users[i].phone_number,Users[i].age,Users[i].email);
+
     fclose(f);
 }
 
 int deleteUser(int ID)
 {
-    int i,f=-1;
-    for(i=0;i<n;i++)
-    {
-        if(u[i].ID==ID)
-        {
-            f=0;
-            int j;
-            for(j=i;j<n-1;j++)
-                u[j]=u[j+1];
-            break;
-        }
-    }
-    if(f==0)
-        n--;
-    return f;
+    int index=findUser(ID);
+    if(index==-1)
+        return -1;
+    int i;
+    if(Users[index].borrows>0)
+        return 0;
+    Users[index]=Users[USERS_SIZE-1];
+    USERS_SIZE--;
+    return 1;
 }
 
 int findUser(int ID)
 {
     int i;
-    for(i=0;i<n;i++)
-        if(u[i].ID==ID)
+    for(i=0;i<USERS_SIZE;i++)
+        if(Users[i].ID==ID)
             break;
-    if(i==n)
+    if(i==USERS_SIZE)
         return -1;
     return i;
 }

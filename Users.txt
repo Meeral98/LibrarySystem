@@ -1,0 +1,7 @@
+Hamdy, Ahmed, 95314, 35, Shatby, Alexandria, 123456789, 26, ahmed@gmail.com
+Maged, Meeral, 95315, 24, Mandara, Alexandria, 1281831369, 19, meeralmaged@gmail.com
+Shemy, Salma, 95316, 21, Smouha, Alexandria, 123456, 20, salmashemy@gmail.com
+Amin, Ayman, 95317, 6, GP, Alexandria, 21586971, 22, aymanamin@gmail.com
+Mohamed, Noran, 95318, 8, Smouha, Alexandria, 1587962, 21, noranmohamed@gmail.com
+Maged, Mohamed, 95319, 24, Moritania, Alexandria, 1281831379, 17, mohamedmaged@gmail.com
+Maged, Mostafa, 95310, 24, Moritania, Alexandria, 123456789, 11, mostafamaged@gmail.com

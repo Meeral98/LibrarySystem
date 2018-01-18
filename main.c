@@ -4,23 +4,22 @@
 #include "UI.h"
 #include "book.h"
 #include "borrowing.h"
+#include "system.h"
 
-int CURRENT_SIZE=0;
-int MAX_LIBRARY_SIZE=100;
-int bSize=0;
-Book Library[100];
-borrowing b[300];
 
-char usersFile[]="D:/Codes/Uni/books.cont/abc.txt";
-char borrowFile[]="D:/Codes/Uni/books.cont/borrow.txt";
-user u[100];
-int n;
+char libraryFile[]="Library.txt";
+char usersFile[]="Users.txt";
+char borrowingsFile[]="Borrowings.txt";
+
 
 int main()
 {
-    read_books();
-    fgetUsers(usersFile);
-    readBorrow(borrowFile);
+    //load data from files
+    readBooks(libraryFile);
+    readUsers(usersFile);
+    readBorrowings(borrowingsFile);
+    //user interface
+    printMostPopular();
     mainMenu();
     return 0;
 }
